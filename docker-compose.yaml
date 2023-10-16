@@ -1,0 +1,48 @@
+version: '3.8'
+services: 
+  mongodb:
+    image: mongo:6.0.5
+    volumes:
+      # This path 'data/db' is needed. Any other path is not acceptable. 
+      - mongo-data-vol:/data/db # named-volume for storing the database-data somewhere else for backup
+    networks:
+      - mern-net
+    container_name: mongo-container
+
+  api: 
+    build: ./api
+    container_name: api-container
+    ports:
+      - 8000:8000
+    volumes:
+      - ./api:/app # for hot-reloading
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017/news
+      - FRONTEND_URL=http://localhost:3000
+    depends_on:
+      - mongodb
+    networks:
+      - mern-net
+
+  client:
+    stdin_open: true
+    tty: true
+    build: ./client
+    container_name: client-container
+    ports:
+      - 3000:3000
+    volumes:
+      - ./client/src:/app/src # for hot-reloading
+    environment:
+      - REACT_APP_API_URL=http://localhost:8000
+    depends_on:
+      - api
+    networks:
+      - mern-net
+
+
+volumes:
+  mongo-data-vol:
+networks:
+  mern-net:
+

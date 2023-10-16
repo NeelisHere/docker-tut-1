@@ -1,0 +1,11 @@
+services: 
+  api: 
+    build: 
+      context: ./api
+      dockerfile: Dockerfile.prod
+    image: node-api-image:1.0.0
+    container_name: api_container
+    ports:
+      - '8000:8000'
+    environment:
+      - KEY=spidermonkey
